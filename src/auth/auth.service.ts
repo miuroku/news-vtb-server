@@ -26,4 +26,14 @@ export class AuthService {
       refresh_token: this.jwtService.sign(payload, refreshTokenOptions)
     }
   }
+
+  async register(username: string, password: string) {
+    // Add if user with such username already exists later
+    const newUser = await this.usersService.createOne(username, password);
+    const payload = {username: newUser.username, sub: newUser.userId};
+    return {
+      access_token: this.jwtService.sign(payload),
+      refresh_token: this.jwtService.sign(payload, refreshTokenOptions)
+    }
+  }
 }
