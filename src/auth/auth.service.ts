@@ -19,8 +19,8 @@ export class AuthService {
 
   async validateUser(username: string, pass: string)  {
     const user = await this.usersService.findOne(username);
-    if (user && user.password == pass) {
-      const {password, ...result} = user;
+    if (user && user.hashedPass == pass) {
+      const {hashedPass, ...result} = user;
       return result;
     }
     return null;
@@ -37,6 +37,9 @@ export class AuthService {
   async register(username: string, password: string, sphere: string) {
     // Add if user with such username already exists later
     const hashedPassword = await this.hashData(password);
+
+    const possibleUser = await this.usersService.findOne(username);
+    if (possibleUser) throw new ForbiddenException('This username already taken, please choose another one');
 
     const newUser = await this.usersService.createOne(username, hashedPassword, sphere);
 

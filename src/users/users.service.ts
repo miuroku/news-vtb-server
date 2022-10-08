@@ -24,12 +24,13 @@ export class UsersService {
   private lastId = 2;
 
   async findOne(username: string): Promise<User | undefined> {
-    // this.prisma.user.findUnique({
-    //   where: {
-
-    //   }
-    // })
-    return this.users.find(user => user.username == username);
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username: username
+      }
+    });
+    //return this.users.find(user => user.username == username);
+    return user;
   }
 
   async createOne(username: string, password: string, sphere_title: string): Promise<User | undefined> {
@@ -63,6 +64,11 @@ export class UsersService {
   }
 
   async deleteOne(username: string) {
-    this.users.filter(user => !(user.username == username));
+    await this.prisma.user.delete({
+      where: {
+        username: username
+      }
+    });
+    //this.users.filter(user => !(user.username == username));
   } 
 }
