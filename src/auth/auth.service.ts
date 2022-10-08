@@ -1,14 +1,21 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
 import { refreshTokenOptions, refreshTokenVerifyOptions } from './config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private prisma: PrismaService
   ) {}
+
+  async hashData(data: string) {
+    return bcrypt.hash(data, 10);
+  }
 
   async validateUser(username: string, pass: string)  {
     const user = await this.usersService.findOne(username);
@@ -27,10 +34,13 @@ export class AuthService {
     }
   }
 
-  async register(username: string, password: string) {
+  async register(username: string, password: string, sphere: string) {
     // Add if user with such username already exists later
-    const newUser = await this.usersService.createOne(username, password);
-    const payload = {username: newUser.username, sub: newUser.userId};
+    const hashedPassword = await this.hashData(password);
+
+    const newUser = await this.usersService.createOne(username, hashedPassword, sphere);
+
+    const payload = {username: newUser.username, sub: newUser.id};
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token: this.jwtService.sign(payload, refreshTokenOptions)

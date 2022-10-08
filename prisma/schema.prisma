@@ -24,7 +24,7 @@ model User {
   likes       Like[] // test functionality
 
   hashedPass  String
-  hash        String
+  hash        String?
   hashedRt    String? // Stroes the hash of the refresh tone // alomost sure that i won't use it
 }
 
@@ -59,7 +59,7 @@ model NewsOnTags {
 model Sphere {
   id          Int @id @default(autoincrement())
   title       String
-  description String
+  description String?
   users       User[]
 }
 

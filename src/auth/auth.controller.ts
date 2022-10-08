@@ -1,6 +1,7 @@
-import { Controller, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { AuthDto } from './dto';
 import { LocalAuthGuard } from './strategies/local/local-auth.guard';
 
 @Controller('auth')
@@ -16,8 +17,8 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Req() req: Request) {
-    return this.authService.register(req.body.username, req.body.password);
+  async register(@Body() authDto: AuthDto) {
+    return this.authService.register(authDto.username, authDto.password, authDto.sphere);
   }
 
   @Post('update-tokens?')
