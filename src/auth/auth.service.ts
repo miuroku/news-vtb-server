@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { refreshTokenOptions } from './config';
+import { refreshTokenOptions, refreshTokenVerifyOptions } from './config';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +34,27 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token: this.jwtService.sign(payload, refreshTokenOptions)
+    }
+  }
+
+  async updateTokensUsignRefreshToken(refreshToken: string, getRefreshAlso: boolean = false) {
+    if (!refreshToken) throw new ForbiddenException(`Couldn't find your refesh_token`);
+    // Add checking if such user still exists.
+    const payload_full = await this.jwtService.verify(refreshToken, refreshTokenVerifyOptions);
+    const payload = {username: payload_full.username, sub: payload_full.sub};
+
+    const ourAccessToken = this.jwtService.sign(payload);
+    const ourRefreshToken = this.jwtService.sign(payload, refreshTokenOptions);
+
+    if (getRefreshAlso) {
+      return {
+        access_token: ourAccessToken,
+        refreshToken: ourRefreshToken
+      }
+    } else {
+      return {
+        access_token: ourAccessToken
+      }
     }
   }
 }

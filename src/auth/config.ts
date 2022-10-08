@@ -1,4 +1,4 @@
-import { JwtModuleOptions, JwtSignOptions } from "@nestjs/jwt"
+import { JwtModuleOptions, JwtSignOptions, JwtVerifyOptions } from "@nestjs/jwt"
 import { jwtConstants } from "./constants"
 
 // Make here a logic for using test values if app in development mode
@@ -12,6 +12,10 @@ export const expiresInOptions = {
 export const refreshTokenOptions: JwtSignOptions = {
   secret: jwtConstants.refreshSecret,
   expiresIn: expiresInOptions.forRefreshToken
+}
+
+export const refreshTokenVerifyOptions: JwtVerifyOptions = {
+  secret: jwtConstants.refreshSecret
 }
 
 export const accessTokenOptions: JwtSignOptions = {
