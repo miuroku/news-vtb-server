@@ -70,5 +70,13 @@ export class UsersService {
       }
     });
     //this.users.filter(user => !(user.username == username));
-  } 
+  }
+
+  async getSphereById(id: number) {
+    return await this.prisma.sphere.findFirst({
+      where: {
+        id: id
+      }
+    });
+  }
 }
