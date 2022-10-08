@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = {username: user.username, sub: user.userId};
+    const payload = {username: user.username, userId: user.userId};
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token: this.jwtService.sign(payload, refreshTokenOptions)
@@ -43,7 +43,7 @@ export class AuthService {
 
     const newUser = await this.usersService.createOne(username, hashedPassword, sphere);
 
-    const payload = {username: newUser.username, sub: newUser.id};
+    const payload = {username: newUser.username, userId: newUser.id};
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token: this.jwtService.sign(payload, refreshTokenOptions)
@@ -54,7 +54,7 @@ export class AuthService {
     if (!refreshToken) throw new ForbiddenException(`Couldn't find your refesh_token`);
     // Add checking if such user still exists.
     const payload_full = await this.jwtService.verify(refreshToken, refreshTokenVerifyOptions);
-    const payload = {username: payload_full.username, sub: payload_full.sub};
+    const payload = {username: payload_full.username, userId: payload_full.sub};
 
     const ourAccessToken = this.jwtService.sign(payload);
     const ourRefreshToken = this.jwtService.sign(payload, refreshTokenOptions);

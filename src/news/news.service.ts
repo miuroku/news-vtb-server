@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IMyReqUser } from 'src/users/users.controller';
 import { UsersService } from 'src/users/users.service';
+const queryString = require('query-string');
 let http = require('http');
 
 @Injectable()
@@ -17,13 +17,19 @@ export class NewsService {
 
   async getDigest(user: any) {
     // get sphere and description from user info.
+
+    // const user = await this.usersService.getUserById(user.userId);
+
     const sphere = await this.usersService.getSphereByUserId(user.userId);
     const sphereDescription = sphere.description;
 
-    const data = JSON.stringify({
+    console.log(`We are here !!!`);
+    const data = queryString.stringify({
       sphere: sphere,
-      sphere_description: sphereDescription
+      sphere_description: sphereDescription || ' '
     });
+
+    console.log(`Data : ${data}`);
 
     const options = {
       host: 'localhost',

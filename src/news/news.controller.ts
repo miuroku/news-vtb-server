@@ -1,8 +1,6 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
-// import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/strategies/jwt/jwt-auth.guard';
-import { IMyReqUser } from 'src/users/users.controller';
 import { NewsService } from './news.service';
 
 @Controller('news')
@@ -21,12 +19,19 @@ export class NewsController {
     return await this.newsService.getInsights();
   }
 
-  @Get('/digest')
+  @Get('/digest?')
   @UseGuards(JwtAuthGuard)
-  async getDigest(@Req() req: IReqWithUser) {
-    const user = req.user;
-    return await this.getDigest(user);
+  async getDigest(@Query('userId') userId: number, @Req() req: Request) {
+    //console.log(`Our req : ${JSON.stringify(req.user, null, 4)}`);
+    const user = req.user as IMyReqUser;
+
+    return await this.newsService.getDigest(user);
   }
+}
+
+export interface IMyReqUser extends Express.User {
+  username: string,
+  sub: number
 }
 
 export interface IReqWithUser extends Request {

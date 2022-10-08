@@ -5,7 +5,8 @@ import { jwtConstants } from "./constants"
 // Make it in config service or smth like that.
 export const expiresInOptions = {
   forRefreshToken: '5 years',
-  forAccessToken: '5 minutes',
+  // forAccessToken: '5 minutes',
+  forAccessToken: '5 years',
   forTest: '60 days'
 }
 
