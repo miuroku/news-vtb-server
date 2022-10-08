@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  username    String @unique
+  email       String?
+  profileImg  String?
+  sphere      Sphere @relation(fields: [sphereId], references: [id])
+  sphereId    Int
+
+  likes       Like[] // test functionality
+
+  hashedPass  String
+  hash        String
+  hashedRt    String? // Stroes the hash of the refresh tone // alomost sure that i won't use it
+}
+
+model NewsEntity {
+  id          Int @id @unique @default(autoincrement())
+  title       String
+  content     String
+  img         String?
+  time        DateTime?
+  createdAt   DateTime @default(now())
+  tags        NewsOnTags[]
+
+  likes       Like[]  // test functionality
+}
+
+model Tag {
+  id          Int @id @unique @default(autoincrement())
+  name        String
+  news        NewsOnTags[]
+}
+
+model NewsOnTags {
+  newsEntity    NewsEntity  @relation(fields: [newsEntityId], references: [id])
+  newsEntityId  Int
+  tags          Tag @relation(fields: [tagId], references: [id])
+  tagId         Int
+  assignedAt    DateTime @default(now())
+
+  @@id([newsEntityId, tagId])
+}
+
+model Sphere {
+  id          Int @id @default(autoincrement())
+  title       String
+  description String
+  users       User[]
+}
+
+model Like {
+  id            Int @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+
+  user          User @relation(fields: [userId],references: [id])
+  userId        Int
+  newsEntuty    NewsEntity @relation(fields: [newsEntityId], references: [id])
+  newsEntityId  Int
+}

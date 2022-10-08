@@ -29,4 +29,8 @@ export class UsersService {
     this.users.push(newUser);
     return newUser;
   }
+
+  async deleteOne(username: string) {
+    this.users.filter(user => !(user.username == username));
+  } 
 }
