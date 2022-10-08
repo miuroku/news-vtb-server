@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { response } from 'express';
 import { UsersService } from 'src/users/users.service';
 const queryString = require('query-string');
 let http = require('http');
+var res = null;
 
 @Injectable()
 export class NewsService {
@@ -25,16 +27,16 @@ export class NewsService {
 
     console.log(`We are here !!!`);
     const data = queryString.stringify({
-      sphere: sphere,
+      sphere: sphere.title,
       sphere_description: sphereDescription || ' '
     });
 
-    console.log(`Data : ${data}`);
+    //console.log(`Data : ${data}`);
 
     const options = {
       host: 'localhost',
       port: 8000,
-      path: '/digest',
+      path: `/digest?${data}`,
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +48,7 @@ export class NewsService {
     httpReq.write(data);
     httpReq.end();
 
-    return null;
+    return res;
   }
   
   async processDigestResponse(response: any) {
@@ -54,6 +56,7 @@ export class NewsService {
 
     response.on('data', function (chunk) {
       console.log("body : " + chunk);
+      res = chunk;
     });
 
     response.on('end', function () {
