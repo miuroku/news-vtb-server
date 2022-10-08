@@ -72,11 +72,24 @@ export class UsersService {
     //this.users.filter(user => !(user.username == username));
   }
 
-  async getSphereById(id: number) {
-    return await this.prisma.sphere.findFirst({
+  async getUserById(userId: number) {
+    return await this.prisma.user.findFirst({
       where: {
-        id: id
+        id: userId
       }
     });
+  }
+
+  async getSphereById(sphereId: number) {
+    return await this.prisma.sphere.findFirst({
+      where: {
+        id: sphereId
+      }
+    });
+  }
+
+  async getSphereByUserId(userId: number) {
+    const user = await this.getUserById(userId);
+    return await this.getSphereById(user.sphereId);
   }
 }
