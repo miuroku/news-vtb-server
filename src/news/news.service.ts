@@ -31,8 +31,8 @@ export class NewsService {
     });
 
     const options = {
-      host: 'localhost',
-      port: 8000,
+      host: process.env.ML_SERVER_HOST || 'localhost',
+      port: parseInt(process.env.ML_SERVER_PORT) || 8000,
       path: `/digest?${data}`,
       method: 'GET',
       headers: {
