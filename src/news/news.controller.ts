@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/strategies/jwt/jwt-auth.guard';
 import { NewsService } from './news.service';
@@ -24,8 +24,13 @@ export class NewsController {
   async getDigest(@Query('userId') userId: number, @Req() req: Request) {
     //console.log(`Our req : ${JSON.stringify(req.user, null, 4)}`);
     const user = req.user as IMyReqUser;
+    let result = null;
 
-    return await this.newsService.getDigest(user);
+    result = await this.newsService.getDigest(user);
+
+    if (!result) throw new InternalServerErrorException('lol');
+    
+    return result;
   }
 }
 

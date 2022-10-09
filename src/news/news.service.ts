@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { response } from 'express';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+//import { response } from 'express';
 import { UsersService } from 'src/users/users.service';
 const queryString = require('query-string');
 let http = require('http');
@@ -25,13 +25,10 @@ export class NewsService {
     const sphere = await this.usersService.getSphereByUserId(user.userId);
     const sphereDescription = sphere.description;
 
-    console.log(`We are here !!!`);
     const data = queryString.stringify({
       sphere: sphere.title,
       sphere_description: sphereDescription || ' '
     });
-
-    //console.log(`Data : ${data}`);
 
     const options = {
       host: 'localhost',
@@ -43,10 +40,17 @@ export class NewsService {
         'Content-Length': Buffer.byteLength(data)
       }
     };
-
+  
     let httpReq = http.request(options, this.processDigestResponse);
     httpReq.write(data);
-    httpReq.end();
+
+    httpReq.on('error', (e) => {
+      console.log(`Your error : ${JSON.stringify(e, null, 4)}`);
+      res = null;      
+    });
+
+    httpReq.end();      
+    
 
     return res;
   }
