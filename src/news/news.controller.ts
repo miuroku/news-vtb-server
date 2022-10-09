@@ -10,13 +10,15 @@ export class NewsController {
   @Get('/trends')
   @UseGuards(JwtAuthGuard)
   async getTrends(@Req() req: Request) {
-    return await this.newsService.getTrends();
+    const user = req.user as IMyReqUser;
+    return await this.newsService.getTrends(user);
   }
 
   @Get('/insights')
   @UseGuards(JwtAuthGuard)
   async getInsights(@Req() req: Request) {
-    return await this.newsService.getInsights();
+    const user = req.user as IMyReqUser;
+    return await this.newsService.getInsights(user);
   }
 
   @Get('/digest?')
@@ -29,7 +31,7 @@ export class NewsController {
     result = await this.newsService.getDigest(user);
 
     if (!result) throw new InternalServerErrorException('lol');
-    
+
     return result;
   }
 }

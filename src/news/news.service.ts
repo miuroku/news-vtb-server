@@ -9,48 +9,62 @@ var res = null;
 export class NewsService {
   constructor(private usersService: UsersService) {}
 
-  async getTrends() {
-    return null;
+  async getTrends(user: any) {
+    res = null;
+
+    const sphereInfo = await this.getSphereAndSphereDescByUserId(user.userId);
+    const data = queryString.stringify(sphereInfo);
+    const options = await this.constructOptions(data, 'trends');
+
+    await this.makeRequestToAnotherServer(options, data);
+
+    return res;
   }
 
-  async getInsights() {
-    return null;
+  async getInsights(user: any) {
+    res = null;
+
+    const sphereInfo = await this.getSphereAndSphereDescByUserId(user.userId);
+    const data = queryString.stringify(sphereInfo);
+    const options = await this.constructOptions(data, 'trends');
+
+    await this.makeRequestToAnotherServer(options, data);
+
+    return res;
   }
 
   async getDigest(user: any) {
-    // get sphere and description from user info.
+    res = null;
+    // const sphere = await this.usersService.getSphereByUserId(user.userId);
+    // const sphereDescription = sphere.description;
+    const sphereInfo = await this.getSphereAndSphereDescByUserId(user.userId);
 
-    // const user = await this.usersService.getUserById(user.userId);
+    const data = queryString.stringify(sphereInfo);
 
-    const sphere = await this.usersService.getSphereByUserId(user.userId);
-    const sphereDescription = sphere.description;
-
-    const data = queryString.stringify({
-      sphere: sphere.title,
-      sphere_description: sphereDescription || ' '
-    });
-
-    const options = {
-      host: process.env.ML_SERVER_HOST || 'localhost',
-      port: parseInt(process.env.ML_SERVER_PORT) || 8000,
-      path: `/digest?${data}`,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(data)
-      }
-    };
+    // const options = {
+    //   host: process.env.ML_SERVER_HOST || 'localhost',
+    //   port: parseInt(process.env.ML_SERVER_PORT) || 8000,
+    //   path: `/digest?${data}`,
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Content-Length': Buffer.byteLength(data)
+    //   }
+    // };
   
-    let httpReq = http.request(options, this.processDigestResponse);
-    httpReq.write(data);
+    const options = await this.constructOptions(data, 'digest');
 
-    httpReq.on('error', (e) => {
-      console.log(`Your error : ${JSON.stringify(e, null, 4)}`);
-      res = null;      
-    });
+    // let httpReq = http.request(options, this.processDigestResponse);
+    // httpReq.write(data);
 
-    httpReq.end();      
+    // httpReq.on('error', (e) => {
+    //   console.log(`Your error : ${JSON.stringify(e, null, 4)}`);
+    //   res = null;      
+    // });
+
+    // httpReq.end();
     
+    await this.makeRequestToAnotherServer(options, data);
 
     return res;
   }
@@ -68,4 +82,38 @@ export class NewsService {
     })
   }
 
+  async getSphereAndSphereDescByUserId(userId: number) {
+    const sphere = await this.usersService.getSphereByUserId(userId);
+    const sphereDescription = sphere.description;
+
+    return {
+      sphere: sphere.title,
+      sphere_description: sphereDescription || ' '
+    }
+  }
+
+  async constructOptions(data: any, urlPath: string) {
+    const readyOptions = {
+      host: process.env.ML_SERVER_HOST || 'localhost',
+      port: parseInt(process.env.ML_SERVER_PORT) || 8000,
+      path: `/${urlPath}?${data}`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    }; 
+  }
+
+  async makeRequestToAnotherServer(options: any, data: any) {
+    let httpReq = http.request(options, this.processDigestResponse);
+    httpReq.write(data);
+
+    httpReq.on('error', (e) => {
+      console.log(`Your error : ${JSON.stringify(e, null, 4)}`);
+      res = null;      
+    });
+
+    httpReq.end();
+  }
 }
